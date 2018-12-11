@@ -1,4 +1,35 @@
 
+
+# Community Subgraphs
+I now counted cycles within each cluster subgraph.  This was particularly fascinating, as the huge clusters had the smallest numbers of cycles, and some middle-sized graphs had the largest number of cycles.  Finally, the nearly-fully-connected smallest cluster had an astounding 6140 cycles amongst just 10 nodes.
+
+### Cycle Count Normalization
+To normalize cycle counts against possible counts, I needed to compute the total number of cycles possible in each group.  I considered many formulas on [this StackExchange question](https://math.stackexchange.com/questions/1363963/number-of-cycles-in-complete-graph), but they were all for undirected graphs and several undercounted possible cycles in a directed graph.  I took inspiration from the method described by B2C's equation, which assumes the graphis complete and then counts every subset of 2 or more nodes.  However, this equation only accounts for undirected cycles, which is presumably why cluster 8 has far more cycles than what this equation yields.  I could not find a formula for the total number of cycles in a directed graph.
+
+$C_{total} = \sum_{i=2}^k \binom{k}{i} $ where $k=$ the number of nodes.
+
+This revealed an interesting observation, which is that iterations in the middle of the range yielded many more cycles of medium length than cycles of small and large length (the binomial function returns its largest values when $i$ is near the middle of its range, and tails out such that $\binom{k}{0}=1$ and $\binom{k}{k}=1$).  This might explain the shape of cycle length histograms in each subgraph.
+
+
+
+from math import factorial
+def max_cycles(k):
+    sumval = 0
+    for i in range(2,k+1):
+        sumval += factorial(k) // (factorial(k-i) * factorial(i))
+    return sumval
+
+cycle_utilization = []
+for sub in range(len(cycle_counts)):
+    cycle_utilization.append( float(cycle_counts[sub]) / max_cycles(len(cluster_subgraphs[sub])) )
+print(cycle_utilization)
+
+
+
+
+
+
+
 def plot_adjmtx(G, bin=False, node_order=None, lines=None):
     # Build dataframe
     A = nx.to_numpy_array(G, nodelist=node_order, weight='weight')
