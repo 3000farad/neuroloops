@@ -1,3 +1,44 @@
+def analyze_subgraph(g, cluster_name=''):
+    print(' +++  {}  +++'.format(cluster_name))
+    print('Nodes = {}'.format(len(g.nodes)))
+    
+    cycle_lengths = []
+    for c in nx.simple_cycles(g):
+        cycle_lengths.append(len(c))
+    num_cycles = len(cycle_lengths)
+    len_hist = dict(Counter(cycle_lengths))
+    print('Cycles = {}'.format(num_cycles))
+    
+    len_mode = max(len_hist.keys(), key=(lambda key: len_hist[key]))
+    # Longest possible cycle length is the number of nodes in the subgraph
+    mode_percent_of_max = (100.0 * len_mode) / len(g.nodes)
+    print('Mode of cycle lengths = {:d}; this traverses {:.2f}\% of the graph'.format(len_mode, mode_percent_of_max))
+    print('Smallest cycle = {}, longest cycle = {}'.format(min(cycle_lengths),max(cycle_lengths)))
+    
+    # See note above about max_cycle calculation
+#     Original function: $C_{total} = \sum_{i=2}^k \binom{k}{i} $ from B2C
+#     sumval = 0
+#     for i in range(2,k+1):
+#         sumval += factorial(k) // (factorial(k-i) * factorial(i))
+#     return sumval
+    max_cycles = factorial(len(g.nodes))
+    cycle_utilization = (100.0 * num_cycles) / max_cycles
+    print('Cycle utilization = {:.2f}\% of {:d} possible cycles'.format(cycle_utilization, max_cycles))
+    
+    width = 1.0
+    plt.bar(len_hist.keys(), len_hist.values(), width, color='g')
+    plt.xlabel('Cycle length')
+    plt.ylabel('Frequency')
+    plt.show()
+    
+    print('\n')
+
+
+
+
+
+
+
 
 
 # Community Subgraphs
